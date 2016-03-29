@@ -150,6 +150,9 @@ private: // configuration
   void
   processSectionWebSocket(const ConfigSection& configSection, bool isDryRun);
 
+  void
+  processSectionDtn(const ConfigSection& configSection, bool isDryRun);
+
 PUBLIC_WITH_TESTS_ELSE_PRIVATE:
   std::map<std::string /*protocol*/, shared_ptr<ProtocolFactory>> m_factories;
 

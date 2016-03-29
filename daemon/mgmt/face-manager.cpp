@@ -48,6 +48,8 @@
 #include "face/websocket-factory.hpp"
 #endif // HAVE_WEBSOCKET
 
+#include "face/dtn-factory.hpp"
+
 namespace nfd {
 
 NFD_LOG_INIT("FaceManager");
@@ -417,6 +419,7 @@ FaceManager::processConfig(const ConfigSection& configSection,
   bool hasSeenUdp = false;
   bool hasSeenEther = false;
   bool hasSeenWebSocket = false;
+  bool hasSeenDtn = false;
   auto nicList = listNetworkInterfaces();
 
   for (const auto& item : configSection) {
@@ -459,6 +462,14 @@ FaceManager::processConfig(const ConfigSection& configSection,
       hasSeenWebSocket = true;
 
       processSectionWebSocket(item.second, isDryRun);
+    }
+    else if (item.first == "dtn") {
+      if (hasSeenDtn) {
+        BOOST_THROW_EXCEPTION(Error("Duplicate \"dtn\" section"));
+      }
+      hasSeenDtn = true;
+
+      processSectionDtn(item.second, isDryRun);
     }
     else {
       BOOST_THROW_EXCEPTION(Error("Unrecognized option \"" + item.first + "\""));
@@ -886,6 +897,38 @@ FaceManager::processSectionWebSocket(const ConfigSection& configSection, bool is
   BOOST_THROW_EXCEPTION(ConfigFile::Error("NFD was compiled without WebSocket, "
                                           "cannot process \"websocket\" section"));
 #endif // HAVE_WEBSOCKET
+}
+
+void
+FaceManager::processSectionDtn(const ConfigSection& configSection, bool isDryRun)
+{
+  /*std::string path = "/usr/local/etc/ibrdtnd.conf";
+
+  for (const auto& i : configSection) {
+    if (i.first == "path") {
+      path = i.second.get_value<std::string>();
+    }
+    else {
+      BOOST_THROW_EXCEPTION(ConfigFile::Error("Unrecognized option \"" +
+                                              i.first + "\" in \"dtn\" section"));
+    }
+  }*/
+  uint16_t port = 5050;
+
+  if (!isDryRun) {
+    if (m_factories.count("dtn") > 0) {
+      return;
+    }
+    NFD_LOG_INFO("setting up DTN ");
+    auto factory = make_shared<DtnFactory>();
+    m_factories.insert(std::make_pair("dtn", factory));
+    dtn::Endpoint endpoint(boost::asio::ip::address_v4::any(), port);
+    //dtn::Endpoint endpoint(dtn, port);
+    shared_ptr<DtnChannel> dtnChannel = factory->createChannel(endpoint);
+    //auto channel = factory->createChannel(path);
+    dtnChannel->listen(bind(&FaceTable::add, &m_faceTable, _1), nullptr);
+    NFD_LOG_INFO("DTN setup finished");
+  }
 }
 
 } // namespace nfd
