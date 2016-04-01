@@ -63,7 +63,7 @@ public:
    */
   shared_ptr<DtnChannel>
   //createChannel(const std::string& dtnPath);
-  createChannel(const dtn::Endpoint& localEndpoint);
+  createChannel(const dtn::Endpoint& localEndpoint, uint16_t port);
 
 public: // from ProtocolFactory
   virtual void

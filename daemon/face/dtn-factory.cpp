@@ -28,14 +28,14 @@ namespace nfd {
 
 shared_ptr<DtnChannel>
 //DtnFactory::createChannel(const std::string& dtnPath)
-DtnFactory::createChannel(const dtn::Endpoint& endpoint)
+DtnFactory::createChannel(const dtn::Endpoint& endpoint, uint16_t port)
 {
   //dtn::Endpoint endpoint(dtnPath);
   auto channel = findChannel(endpoint);
   if (channel)
     return channel;
 
-  channel = make_shared<DtnChannel>(endpoint);
+  channel = make_shared<DtnChannel>(endpoint, port);
   m_channels[endpoint] = channel;
   return channel;
 }
@@ -53,10 +53,10 @@ std::vector<shared_ptr<const Channel>>
 DtnFactory::getChannels() const
 {
   std::vector<shared_ptr<const Channel>> channels;
-  //channels.reserve(m_channels.size());
+  channels.reserve(m_channels.size());
 
-  //for (const auto& i : m_channels)
-  //  channels.push_back(i.second);
+  for (const auto& i : m_channels)
+    channels.push_back(i.second);
 
   return channels;
 }

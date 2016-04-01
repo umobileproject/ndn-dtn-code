@@ -913,18 +913,20 @@ FaceManager::processSectionDtn(const ConfigSection& configSection, bool isDryRun
                                               i.first + "\" in \"dtn\" section"));
     }
   }*/
+  uint16_t endpointId = 2;
   uint16_t port = 5050;
 
   if (!isDryRun) {
     if (m_factories.count("dtn") > 0) {
       return;
     }
-    NFD_LOG_INFO("setting up DTN ");
-    auto factory = make_shared<DtnFactory>();
+    NFD_LOG_INFO("setting up DTN:");
+    //auto factory = make_shared<DtnFactory>();
+    shared_ptr<DtnFactory> factory = make_shared<DtnFactory>();
     m_factories.insert(std::make_pair("dtn", factory));
-    dtn::Endpoint endpoint(boost::asio::ip::address_v4::any(), port);
-    //dtn::Endpoint endpoint(dtn, port);
-    shared_ptr<DtnChannel> dtnChannel = factory->createChannel(endpoint);
+    //dtn::Endpoint endpoint(boost::asio::ip::address_v4::any(), port);
+    dtn::Endpoint& endpoint(endpointId);
+    shared_ptr<DtnChannel> dtnChannel = factory->createChannel(endpoint, port);
     //auto channel = factory->createChannel(path);
     dtnChannel->listen(bind(&FaceTable::add, &m_faceTable, _1), nullptr);
     NFD_LOG_INFO("DTN setup finished");

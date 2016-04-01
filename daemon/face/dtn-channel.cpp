@@ -36,12 +36,12 @@ namespace nfd {
 NFD_LOG_INIT("DtnChannel");
 
 //DtnChannel::DtnChannel()
-DtnChannel::DtnChannel(const dtn::Endpoint& endpoint)
+DtnChannel::DtnChannel(const dtn::Endpoint& endpoint, uint16_t port)
   : m_endpoint(endpoint)
-  , m_acceptor(getGlobalIoService())
-  , m_acceptSocket(getGlobalIoService())
+  , m_port(port)
 {
-  setUri(FaceUri(m_endpoint));
+  m_is_open = false;
+  setUri(FaceUri(m_endpoint, m_port));
 }
 
 DtnChannel::~DtnChannel()
@@ -52,6 +52,7 @@ DtnChannel::~DtnChannel()
     //boost::system::error_code error;
     //m_acceptor.close(error);
     NFD_LOG_DEBUG(" Removing dtn socket");
+    m_is_open = false;
     //boost::filesystem::remove(m_endpoint.path(), error);
   }
 }
@@ -61,10 +62,11 @@ DtnChannel::listen(const FaceCreatedCallback& onFaceCreated,
                           const FaceCreationFailedCallback& onAcceptFailed)
                           //int backlog/* = acceptor::max_connections*/)
 {
-  /*if (isListening()) {
+  if (isListening()) {
     NFD_LOG_WARN("[" << m_endpoint << "] Already listening");
     return;
-  }*/
+  }
+  m_is_open = true;
 
   //m_acceptor.open();
   //m_acceptor.bind(m_endpoint);
