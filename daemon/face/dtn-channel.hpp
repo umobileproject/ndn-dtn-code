@@ -30,7 +30,7 @@
 
 namespace nfd {
 
-namespace dtn {
+namespace ibrdtn {
 //typedef const char* Endpoint;
 typedef uint16_t Endpoint;
 } // namespace dtn
@@ -59,7 +59,7 @@ public:
    * needs to explicitly call DtnChannel::listen method.
    */
   explicit
-  DtnChannel(const dtn::Endpoint& endpoint, uint16_t port);
+  DtnChannel(const ibrdtn::Endpoint& endpoint, uint16_t port);
   //DtnChannel();
 
   ~DtnChannel() DECL_OVERRIDE;
@@ -92,10 +92,10 @@ private:
                const FaceCreationFailedCallback& onAcceptFailed);
 
 private:
-  dtn::Endpoint m_endpoint;
+  ibrdtn::Endpoint m_endpoint;
   uint16_t m_port;
   bool m_is_open;
-  std::map<dtn::Endpoint, shared_ptr<Face>> m_channelFaces;
+  std::map<ibrdtn::Endpoint, shared_ptr<Face>> m_channelFaces;
 
   //boost::asio::ip::tcp::acceptor m_acceptor;
   //boost::asio::ip::tcp::socket m_acceptSocket;

@@ -36,7 +36,7 @@ namespace nfd {
 NFD_LOG_INIT("DtnChannel");
 
 //DtnChannel::DtnChannel()
-DtnChannel::DtnChannel(const dtn::Endpoint& endpoint, uint16_t port)
+DtnChannel::DtnChannel(const ibrdtn::Endpoint& endpoint, uint16_t port)
   : m_endpoint(endpoint)
   , m_port(port)
 {

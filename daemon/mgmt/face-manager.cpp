@@ -49,6 +49,7 @@
 #endif // HAVE_WEBSOCKET
 
 #include "face/dtn-factory.hpp"
+#include <ibrdtn/data/EID.h>
 
 namespace nfd {
 
@@ -902,17 +903,8 @@ FaceManager::processSectionWebSocket(const ConfigSection& configSection, bool is
 void
 FaceManager::processSectionDtn(const ConfigSection& configSection, bool isDryRun)
 {
-  /*std::string path = "/usr/local/etc/ibrdtnd.conf";
+  /*std::string path = "/usr/local/etc/ibrdtnd.conf";*/
 
-  for (const auto& i : configSection) {
-    if (i.first == "path") {
-      path = i.second.get_value<std::string>();
-    }
-    else {
-      BOOST_THROW_EXCEPTION(ConfigFile::Error("Unrecognized option \"" +
-                                              i.first + "\" in \"dtn\" section"));
-    }
-  }*/
   uint16_t endpointId = 2;
   uint16_t port = 5050;
 
@@ -925,11 +917,18 @@ FaceManager::processSectionDtn(const ConfigSection& configSection, bool isDryRun
     shared_ptr<DtnFactory> factory = make_shared<DtnFactory>();
     m_factories.insert(std::make_pair("dtn", factory));
     //dtn::Endpoint endpoint(boost::asio::ip::address_v4::any(), port);
-    dtn::Endpoint& endpoint(endpointId);
+    ibrdtn::Endpoint& endpoint(endpointId);
     shared_ptr<DtnChannel> dtnChannel = factory->createChannel(endpoint, port);
     //auto channel = factory->createChannel(path);
     dtnChannel->listen(bind(&FaceTable::add, &m_faceTable, _1), nullptr);
     NFD_LOG_INFO("DTN setup finished");
+
+    SDNV<long unsigned int> eid(endpointId);
+    SDNV<long unsigned int> app(1);
+
+    Number& node(eid);
+    Number& application(app);
+    dtn::data::EID eID(node, application);
   }
 }
 

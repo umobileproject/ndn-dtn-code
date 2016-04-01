@@ -30,6 +30,7 @@
 #include "dtn-channel.hpp"
 #include "ibrcommon/ibrcommon.h"
 #include "ibrdtn/api/Client.h"
+#include "ibrdtn/data/EID.h"
 
 namespace nfd {
 
@@ -63,7 +64,7 @@ public:
    */
   shared_ptr<DtnChannel>
   //createChannel(const std::string& dtnPath);
-  createChannel(const dtn::Endpoint& localEndpoint, uint16_t port);
+  createChannel(const ibrdtn::Endpoint& localEndpoint, uint16_t port);
 
 public: // from ProtocolFactory
   virtual void
@@ -84,10 +85,10 @@ private:
    */
   shared_ptr<DtnChannel>
   //findChannel() const;
-  findChannel(const dtn::Endpoint& endpoint) const;
+  findChannel(const ibrdtn::Endpoint& endpoint) const;
 
 private:
-  std::map<dtn::Endpoint, shared_ptr<DtnChannel>> m_channels;
+  std::map<ibrdtn::Endpoint, shared_ptr<DtnChannel>> m_channels;
 };
 
 } // namespace nfd
