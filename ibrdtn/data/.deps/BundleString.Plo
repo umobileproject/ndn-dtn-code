@@ -1,7 +1,7 @@
 BundleString.lo: BundleString.cpp /usr/include/stdc-predef.h \
  ../../ibrdtn/config.h ../../ibrdtn/data/BundleString.h \
  ../../ibrdtn/data/Number.h ../../ibrdtn/data/SDNV.h \
- /media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/Exceptions.h \
+ /media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/Exceptions.h \
  /usr/include/c++/4.9/stdexcept /usr/include/c++/4.9/exception \
  /usr/include/x86_64-linux-gnu/c++/4.9/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/4.9/bits/os_defines.h \
@@ -112,7 +112,7 @@ BundleString.lo: BundleString.cpp /usr/include/stdc-predef.h \
 
 ../../ibrdtn/data/SDNV.h:
 
-/media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/Exceptions.h:
+/media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/Exceptions.h:
 
 /usr/include/c++/4.9/stdexcept:
 

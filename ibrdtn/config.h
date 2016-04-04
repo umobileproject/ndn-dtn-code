@@ -39,7 +39,10 @@
 #define HAVE_NETINET_IN_H 1
 
 /* "openssl library is available" */
-#define HAVE_OPENSSL 1
+/* #undef HAVE_OPENSSL */
+
+/* Define to 1 if you have the <regex.h> header file. */
+#define HAVE_REGEX_H 1
 
 /* Define to 1 if you have the `sqrt' function. */
 #define HAVE_SQRT 1
@@ -75,16 +78,16 @@
 #define HAVE_UNISTD_H 1
 
 /* "zlib library is available" */
-#define HAVE_ZLIB 1
+/* #undef HAVE_ZLIB */
 
 /* Define to 1 if the system has the type `_Bool'. */
 /* #undef HAVE__BOOL */
 
 /* bundle security protocol supported */
-#define IBRDTN_SUPPORT_BSP 1
+/* #undef IBRDTN_SUPPORT_BSP */
 
 /* bundle compression support */
-#define IBRDTN_SUPPORT_COMPRESSION 1
+/* #undef IBRDTN_SUPPORT_COMPRESSION */
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */

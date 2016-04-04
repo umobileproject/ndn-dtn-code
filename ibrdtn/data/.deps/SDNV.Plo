@@ -1,5 +1,5 @@
 SDNV.lo: SDNV.cpp /usr/include/stdc-predef.h ../../ibrdtn/data/SDNV.h \
- /media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/Exceptions.h \
+ /media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/Exceptions.h \
  /usr/include/c++/4.9/stdexcept /usr/include/c++/4.9/exception \
  /usr/include/x86_64-linux-gnu/c++/4.9/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/4.9/bits/os_defines.h \
@@ -98,7 +98,7 @@ SDNV.lo: SDNV.cpp /usr/include/stdc-predef.h ../../ibrdtn/data/SDNV.h \
 
 ../../ibrdtn/data/SDNV.h:
 
-/media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/Exceptions.h:
+/media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/Exceptions.h:
 
 /usr/include/c++/4.9/stdexcept:
 

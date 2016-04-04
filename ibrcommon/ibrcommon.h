@@ -21,10 +21,10 @@
  */
 
 /* "lowpan extension is available" */
-#define IBRCOMMON_SUPPORT_LOWPAN 1
+/* #undef IBRCOMMON_SUPPORT_LOWPAN */
 
 /* "ssl extension is available" */
-#define IBRCOMMON_SUPPORT_SSL 1
+/* #undef IBRCOMMON_SUPPORT_SSL */
 
 /* "xml extension is available" */
 /* #undef IBRCOMMON_SUPPORT_XML */

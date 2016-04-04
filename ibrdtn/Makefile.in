@@ -286,10 +286,11 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GCOV_CFLAGS = @GCOV_CFLAGS@
+GCOV_LIBS = @GCOV_LIBS@
 GENERIC_API_VERSION = @GENERIC_API_VERSION@
 GENERIC_LIBRARY_NAME = @GENERIC_LIBRARY_NAME@
 GENERIC_LIBRARY_VERSION = @GENERIC_LIBRARY_VERSION@
-GENERIC_RELEASE = @GENERIC_RELEASE@
 GENERIC_VERSION = @GENERIC_VERSION@
 GLIB_CFLAGS = @GLIB_CFLAGS@
 GLIB_LIBS = @GLIB_LIBS@
@@ -402,8 +403,8 @@ cc_sources = dummy.cpp
 library_includedir = $(includedir)/$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION)/$(GENERIC_LIBRARY_NAME)
 nodist_library_include_HEADERS = ibrdtn.h
 library_include_HEADERS = $(h_sources)
-AM_CPPFLAGS = -I$(top_srcdir) $(ibrcommon_CFLAGS)
-AM_LDFLAGS = $(ibrcommon_LIBS)
+AM_CPPFLAGS = -I$(top_srcdir) $(ibrcommon_CFLAGS) $(GCOV_CFLAGS)
+AM_LDFLAGS = $(ibrcommon_LIBS) $(GCOV_LIBS)
 ibrdtn_libs = api/libapi.la data/libdata.la streams/libstreams.la \
 	utils/libutils.la $(am__append_2)
 @ANDROID_TRUE@noinst_DATA = Android.mk
@@ -412,8 +413,7 @@ ibrdtn_libs = api/libapi.la data/libdata.la streams/libstreams.la \
 @ANDROID_FALSE@libibrdtn_la_SOURCES = $(h_sources) $(cc_sources)
 @ANDROID_FALSE@libibrdtn_la_LIBADD = $(ibrdtn_libs)
 @ANDROID_FALSE@libibrdtn_la_LDFLAGS = -version-info \
-@ANDROID_FALSE@	$(GENERIC_LIBRARY_VERSION) -release \
-@ANDROID_FALSE@	$(GENERIC_RELEASE) $(am__append_3)
+@ANDROID_FALSE@	$(GENERIC_LIBRARY_VERSION) $(am__append_3)
 all: config.h ibrdtn.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

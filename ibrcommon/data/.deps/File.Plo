@@ -121,7 +121,7 @@ File.lo: File.cpp /usr/include/stdc-predef.h ../../ibrcommon/config.h \
  /usr/include/c++/4.9/cstdio \
  /usr/include/x86_64-linux-gnu/c++/4.9/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/4.9/bits/c++io.h \
- /usr/include/c++/4.9/bits/fstream.tcc
+ /usr/include/c++/4.9/bits/fstream.tcc /usr/include/libgen.h
 
 /usr/include/stdc-predef.h:
 
@@ -450,3 +450,5 @@ File.lo: File.cpp /usr/include/stdc-predef.h ../../ibrcommon/config.h \
 /usr/include/x86_64-linux-gnu/c++/4.9/bits/c++io.h:
 
 /usr/include/c++/4.9/bits/fstream.tcc:
+
+/usr/include/libgen.h:

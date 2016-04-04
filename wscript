@@ -37,14 +37,14 @@ def options(opt):
     opt.load(['compiler_cxx', 'gnu_dirs'])
     opt.load(['boost', 'unix-socket', 'dependency-checker', 'websocket',
               'default-compiler-flags', 'coverage', 'pch', 'boost-kqueue',
-              'doxygen', 'sphinx_build', 'type_traits', 'compiler-features'],
-#              'ibrdtn', 'ibrcommon'],
+              'doxygen', 'sphinx_build', 'type_traits', 'compiler-features',
+              'ibrdtn', 'ibrcommon'],
              tooldir=['.waf-tools'])
 
     nfdopt = opt.add_option_group('NFD Options')
     opt.addUnixOptions(nfdopt)
-    #opt.addIbrdtnOptions(nfdopt)
-    #opt.addIbrcommonOptions(nfdopt)
+    opt.addIbrdtnOptions(nfdopt)
+    opt.addIbrcommonOptions(nfdopt)
     opt.addWebsocketOptions(nfdopt)
     opt.addDependencyOptions(nfdopt, 'libpcap')
     nfdopt.add_option('--without-libpcap', action='store_true', default=False,
@@ -53,6 +53,8 @@ def options(opt):
 
     opt.addDependencyOptions(nfdopt, 'librt',     '(optional)')
     opt.addDependencyOptions(nfdopt, 'libresolv', '(optional)')
+    opt.addDependencyOptions(nfdopt, 'libibrdtn')
+    opt.addDependencyOptions(nfdopt, 'libibrcommon')
 
     nfdopt.add_option('--with-tests', action='store_true', default=False,
                       dest='with_tests', help='''Build unit tests''')
@@ -76,8 +78,8 @@ def configure(conf):
     conf.load(['compiler_cxx', 'gnu_dirs',
                'default-compiler-flags', 'pch', 'boost-kqueue',
                'boost', 'dependency-checker', 'websocket',
-               'doxygen', 'sphinx_build', 'type_traits', 'compiler-features'])
-               #'ibrdtn', 'ibrcommon'])
+               'doxygen', 'sphinx_build', 'type_traits', 'compiler-features',
+               'ibrdtn', 'ibrcommon'])
 
     conf.find_program('bash', var='BASH')
 
@@ -88,8 +90,8 @@ def configure(conf):
 
     conf.checkDependency(name='librt', lib='rt', mandatory=False)
     conf.checkDependency(name='libresolv', lib='resolv', mandatory=False)
-    conf.checkDependency(name='ibrcommon', lib='ibrcommon', mandatory=False)
-    conf.checkDependency(name='ibrdtn', lib='ibrdtn', mandatory=False)
+    conf.checkDependency(name='libibrcommon', lib='ibrcommon', mandatory=False)
+    conf.checkDependency(name='libibrdtn', lib='ibrdtn', mandatory=False)
 
     if not conf.check_cxx(msg='Checking if privilege drop/elevation is supported', mandatory=False,
                           define_name='HAVE_PRIVILEGE_DROP_AND_ELEVATE', fragment='''

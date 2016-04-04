@@ -31,12 +31,12 @@ namespace dtn
 		bool MemoryBundleSet::__store_path_set__ = false;
 
 		MemoryBundleSet::MemoryBundleSet(BundleSet::Listener *listener, Length bf_size)
-		 : _name(), _bf_size(bf_size), _bf(bf_size * 8), _listener(listener), _consistent(true)
+		 : _name(), _bf_size(bf_size), _bf(bf_size), _listener(listener), _consistent(true)
 		{
 		}
 
 		MemoryBundleSet::MemoryBundleSet(const std::string &name, BundleSet::Listener *listener, Length bf_size)
-		 : _name(name), _bf_size(bf_size), _bf(bf_size * 8), _listener(listener), _consistent(true)
+		 : _name(name), _bf_size(bf_size), _bf(bf_size), _listener(listener), _consistent(true)
 		{
 			try {
 				restore();
@@ -114,8 +114,20 @@ namespace dtn
 			BundleSetImpl::ExpiringBundle exb(*ret.first);
 			_expire.insert(exb);
 
-			// add bundle to the bloomfilter
-			bundle.addTo(_bf);
+			// increase the size of the Bloom-filter if the allocation is too high
+			if (_consistent && _bf.grow(_bundles.size() + 1))
+			{
+				// re-insert all bundles
+				for (bundle_set::const_iterator iter = _bundles.begin(); iter != _bundles.end(); ++iter)
+				{
+					(*iter).addTo(_bf);
+				}
+			}
+			else
+			{
+				// add bundle to the bloomfilter
+				bundle.addTo(_bf);
+			}
 		}
 
 		void MemoryBundleSet::clear() throw ()
@@ -179,6 +191,13 @@ namespace dtn
 			{
 				// rebuild the bloom-filter
 				_bf.clear();
+
+				// get number of elements
+				const size_t bnum = size();
+
+				// increase the size of the Bloom-filter if the allocation is too high
+				_bf.grow(bnum);
+
 				for (bundle_set::const_iterator iter = _bundles.begin(); iter != _bundles.end(); ++iter)
 				{
 					(*iter).addTo(_bf);

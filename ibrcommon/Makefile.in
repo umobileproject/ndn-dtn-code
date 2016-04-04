@@ -319,10 +319,11 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GCOV_CFLAGS = @GCOV_CFLAGS@
+GCOV_LIBS = @GCOV_LIBS@
 GENERIC_API_VERSION = @GENERIC_API_VERSION@
 GENERIC_LIBRARY_NAME = @GENERIC_LIBRARY_NAME@
 GENERIC_LIBRARY_VERSION = @GENERIC_LIBRARY_VERSION@
-GENERIC_RELEASE = @GENERIC_RELEASE@
 GENERIC_VERSION = @GENERIC_VERSION@
 GREP = @GREP@
 INSTALL = @INSTALL@
@@ -443,8 +444,8 @@ library_includedir = $(includedir)/$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION
 nodist_library_include_HEADERS = ibrcommon.h
 library_include_HEADERS = $(h_sources)
 AUTOMAKE_OPTIONS = nostdinc
-AM_CPPFLAGS = -I$(top_srcdir) $(PTHREAD_CFLAGS) $(NL_CFLAGS) $(NL_ROUTE_CFLAGS) $(NL_GENL_CFLAGS)
-AM_LDFLAGS = $(PTHREAD_LIBS) $(NL_LIBS) $(NL_ROUTE_LIBS) $(NL_GENL_LIBS)
+AM_CPPFLAGS = -I$(top_srcdir) $(PTHREAD_CFLAGS) $(NL_CFLAGS) $(NL_ROUTE_CFLAGS) $(NL_GENL_CFLAGS) $(GCOV_CFLAGS)
+AM_LDFLAGS = $(PTHREAD_LIBS) $(NL_LIBS) $(NL_ROUTE_LIBS) $(NL_GENL_LIBS) $(GCOV_LIBS)
 ibrcommon_libs = data/libibrcommon_data.la link/libibrcommon_link.la \
 	net/libibrcommon_net.la thread/libibrcommon_thread.la \
 	$(am__append_5) $(am__append_6)
@@ -454,8 +455,7 @@ ibrcommon_libs = data/libibrcommon_data.la link/libibrcommon_link.la \
 @ANDROID_FALSE@libibrcommon_la_SOURCES = $(h_sources) $(cc_sources)
 @ANDROID_FALSE@libibrcommon_la_LIBADD = $(ibrcommon_libs)
 @ANDROID_FALSE@libibrcommon_la_LDFLAGS = -version-info \
-@ANDROID_FALSE@	$(GENERIC_LIBRARY_VERSION) -release \
-@ANDROID_FALSE@	$(GENERIC_RELEASE) $(am__append_7)
+@ANDROID_FALSE@	$(GENERIC_LIBRARY_VERSION) $(am__append_7)
 all: config.h ibrcommon.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

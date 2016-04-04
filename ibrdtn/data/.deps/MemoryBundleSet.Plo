@@ -2,7 +2,7 @@ MemoryBundleSet.lo: MemoryBundleSet.cpp /usr/include/stdc-predef.h \
  ../../ibrdtn/data/MemoryBundleSet.h ../../ibrdtn/data/BundleSetImpl.h \
  ../../ibrdtn/data/MetaBundle.h ../../ibrdtn/data/Number.h \
  ../../ibrdtn/data/SDNV.h \
- /media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/Exceptions.h \
+ /media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/Exceptions.h \
  /usr/include/c++/4.9/stdexcept /usr/include/c++/4.9/exception \
  /usr/include/x86_64-linux-gnu/c++/4.9/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/4.9/bits/os_defines.h \
@@ -101,7 +101,7 @@ MemoryBundleSet.lo: MemoryBundleSet.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/4.9/ext/alloc_traits.h \
  /usr/include/c++/4.9/bits/stl_map.h \
  /usr/include/c++/4.9/bits/stl_multimap.h \
- /media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/data/BloomFilter.h \
+ /media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/data/BloomFilter.h \
  /usr/include/c++/4.9/cstddef /usr/include/c++/4.9/algorithm \
  /usr/include/c++/4.9/utility /usr/include/c++/4.9/bits/stl_relops.h \
  /usr/include/c++/4.9/bits/stl_algo.h \
@@ -126,25 +126,25 @@ MemoryBundleSet.lo: MemoryBundleSet.cpp /usr/include/stdc-predef.h \
  ../../ibrdtn/data/Bundle.h ../../ibrdtn/data/Block.h \
  ../../ibrdtn/data/Dictionary.h ../../ibrdtn/data/Serializer.h \
  ../../ibrdtn/data/PrimaryBlock.h \
- /media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/thread/Mutex.h \
+ /media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/thread/Mutex.h \
  ../../ibrdtn/data/BundleFragment.h ../../ibrdtn/data/PayloadBlock.h \
- /media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/data/BLOB.h \
- /media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/thread/MutexLock.h \
- /media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/data/File.h \
+ /media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/data/BLOB.h \
+ /media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/thread/MutexLock.h \
+ /media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/data/File.h \
  /usr/include/dirent.h /usr/include/x86_64-linux-gnu/bits/dirent.h \
  /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
  /usr/include/x86_64-linux-gnu/bits/local_lim.h \
  /usr/include/linux/limits.h /usr/include/x86_64-linux-gnu/sys/stat.h \
  /usr/include/x86_64-linux-gnu/bits/stat.h \
- /media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/thread/Semaphore.h \
+ /media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/thread/Semaphore.h \
  /usr/include/semaphore.h /usr/include/x86_64-linux-gnu/bits/semaphore.h \
- /media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/refcnt_ptr.h \
+ /media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/refcnt_ptr.h \
  /usr/include/c++/4.9/fstream /usr/include/c++/4.9/bits/codecvt.h \
  /usr/include/c++/4.9/cstdio \
  /usr/include/x86_64-linux-gnu/c++/4.9/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/4.9/bits/c++io.h \
  /usr/include/c++/4.9/bits/fstream.tcc ../../ibrdtn/data/ExtensionBlock.h \
- /media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/Iterator.h \
+ /media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/Iterator.h \
  /usr/include/c++/4.9/iterator \
  /usr/include/c++/4.9/bits/stream_iterator.h /usr/include/c++/4.9/set \
  /usr/include/c++/4.9/bits/stl_set.h \
@@ -163,7 +163,7 @@ MemoryBundleSet.lo: MemoryBundleSet.cpp /usr/include/stdc-predef.h \
 
 ../../ibrdtn/data/SDNV.h:
 
-/media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/Exceptions.h:
+/media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/Exceptions.h:
 
 /usr/include/c++/4.9/stdexcept:
 
@@ -417,7 +417,7 @@ MemoryBundleSet.lo: MemoryBundleSet.cpp /usr/include/stdc-predef.h \
 
 /usr/include/c++/4.9/bits/stl_multimap.h:
 
-/media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/data/BloomFilter.h:
+/media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/data/BloomFilter.h:
 
 /usr/include/c++/4.9/cstddef:
 
@@ -483,17 +483,17 @@ MemoryBundleSet.lo: MemoryBundleSet.cpp /usr/include/stdc-predef.h \
 
 ../../ibrdtn/data/PrimaryBlock.h:
 
-/media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/thread/Mutex.h:
+/media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/thread/Mutex.h:
 
 ../../ibrdtn/data/BundleFragment.h:
 
 ../../ibrdtn/data/PayloadBlock.h:
 
-/media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/data/BLOB.h:
+/media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/data/BLOB.h:
 
-/media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/thread/MutexLock.h:
+/media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/thread/MutexLock.h:
 
-/media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/data/File.h:
+/media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/data/File.h:
 
 /usr/include/dirent.h:
 
@@ -509,13 +509,13 @@ MemoryBundleSet.lo: MemoryBundleSet.cpp /usr/include/stdc-predef.h \
 
 /usr/include/x86_64-linux-gnu/bits/stat.h:
 
-/media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/thread/Semaphore.h:
+/media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/thread/Semaphore.h:
 
 /usr/include/semaphore.h:
 
 /usr/include/x86_64-linux-gnu/bits/semaphore.h:
 
-/media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/refcnt_ptr.h:
+/media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/refcnt_ptr.h:
 
 /usr/include/c++/4.9/fstream:
 
@@ -531,7 +531,7 @@ MemoryBundleSet.lo: MemoryBundleSet.cpp /usr/include/stdc-predef.h \
 
 ../../ibrdtn/data/ExtensionBlock.h:
 
-/media/nikos/small/Developer/ibr-dtn/ibrcommon-1.0.1/ibrcommon/Iterator.h:
+/media/nikos/small/Developer/ibrdtn/ibrdtn/ibrdtn/../ibrcommon/ibrcommon/Iterator.h:
 
 /usr/include/c++/4.9/iterator:
 

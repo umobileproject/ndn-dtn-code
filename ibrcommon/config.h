@@ -74,7 +74,7 @@
 /* #undef HAVE_LIBXML */
 
 /* "enable lowpan support" */
-#define HAVE_LOWPAN_SUPPORT 1
+/* #undef HAVE_LOWPAN_SUPPORT */
 
 /* Define to 1 if you have the <mach/mach_time.h> header file. */
 /* #undef HAVE_MACH_MACH_TIME_H */
@@ -95,7 +95,7 @@
 #define HAVE_NETINET_IN_H 1
 
 /* "openssl library is available" */
-#define HAVE_OPENSSL 1
+/* #undef HAVE_OPENSSL */
 
 /* Define to 1 if you have the `pow' function. */
 #define HAVE_POW 1
@@ -167,10 +167,10 @@
 /* #undef HAVE__BOOL */
 
 /* "lowpan extension is available" */
-#define IBRCOMMON_SUPPORT_LOWPAN 1
+/* #undef IBRCOMMON_SUPPORT_LOWPAN */
 
 /* "ssl extension is available" */
-#define IBRCOMMON_SUPPORT_SSL 1
+/* #undef IBRCOMMON_SUPPORT_SSL */
 
 /* "xml extension is available" */
 /* #undef IBRCOMMON_SUPPORT_XML */
