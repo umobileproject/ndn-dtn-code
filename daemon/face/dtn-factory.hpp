@@ -28,9 +28,6 @@
 
 #include "protocol-factory.hpp"
 #include "dtn-channel.hpp"
-#include "ibrcommon/ibrcommon.h"
-#include "ibrdtn/api/Client.h"
-#include "ibrdtn/data/EID.h"
 
 namespace nfd {
 
@@ -63,7 +60,6 @@ public:
    * \throws DtnFactory::Error
    */
   shared_ptr<DtnChannel>
-  //createChannel(const std::string& dtnPath);
   createChannel(const ibrdtn::Endpoint& localEndpoint, uint16_t port);
 
 public: // from ProtocolFactory

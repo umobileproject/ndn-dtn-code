@@ -24,11 +24,7 @@
  */
 
 #include "dtn-channel.hpp"
-//#include "generic-link-service.hpp"
-//#include "unix-stream-transport.hpp"
-//#include "core/global-io.hpp"
 
-//#include <boost/filesystem.hpp>
 #include <sys/stat.h> // for chmod()
 
 namespace nfd {
@@ -40,7 +36,29 @@ DtnChannel::DtnChannel(const ibrdtn::Endpoint& endpoint, uint16_t port)
   : m_endpoint(endpoint)
   , m_port(port)
 {
+  const std::string& scheme("CBHE");
+
   m_is_open = false;
+  dtn::data::SDNV<long unsigned int> eid(endpoint);
+  dtn::data::SDNV<long unsigned int> app(1);
+
+  dtn::data::Number node(eid);
+  dtn::data::Number application(app);
+
+  //dtn::data::EID eID;
+
+  //eID.setApplication(application);
+  dtn::data::EID eID(node, application);
+
+  //const dtn::data::EID eID(scheme);
+
+  //const dtn::data::EID& eID();
+  if (eID.isNone())
+  {
+    return;
+  }
+
+
   setUri(FaceUri(m_endpoint, m_port));
 }
 

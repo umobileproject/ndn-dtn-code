@@ -49,7 +49,6 @@
 #endif // HAVE_WEBSOCKET
 
 #include "face/dtn-factory.hpp"
-#include <ibrdtn/data/EID.h>
 
 namespace nfd {
 
@@ -917,18 +916,11 @@ FaceManager::processSectionDtn(const ConfigSection& configSection, bool isDryRun
     shared_ptr<DtnFactory> factory = make_shared<DtnFactory>();
     m_factories.insert(std::make_pair("dtn", factory));
     //dtn::Endpoint endpoint(boost::asio::ip::address_v4::any(), port);
-    ibrdtn::Endpoint& endpoint(endpointId);
+    ibrdtn::Endpoint endpoint(endpointId);
     shared_ptr<DtnChannel> dtnChannel = factory->createChannel(endpoint, port);
     //auto channel = factory->createChannel(path);
     dtnChannel->listen(bind(&FaceTable::add, &m_faceTable, _1), nullptr);
     NFD_LOG_INFO("DTN setup finished");
-
-    SDNV<long unsigned int> eid(endpointId);
-    SDNV<long unsigned int> app(1);
-
-    Number& node(eid);
-    Number& application(app);
-    dtn::data::EID eID(node, application);
   }
 }
 

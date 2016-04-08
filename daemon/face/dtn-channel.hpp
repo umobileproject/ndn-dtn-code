@@ -27,6 +27,7 @@
 
 #include "channel.hpp"
 #include "core/global-io.hpp"
+#include <ibrdtn/data/EID.h>
 
 namespace nfd {
 
