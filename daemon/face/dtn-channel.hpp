@@ -28,13 +28,13 @@
 #include "channel.hpp"
 #include "core/global-io.hpp"
 #include <ibrdtn/data/EID.h>
+#include <ibrdtn/api/Client.h>
+#include <ibrcommon/net/socket.h>
+#include <ibrcommon/net/socketstream.h>
 
 namespace nfd {
 
-namespace ibrdtn {
-//typedef const char* Endpoint;
-typedef uint16_t Endpoint;
-} // namespace dtn
+class AsyncIbrDtnClient;
 
 /**
  * \brief Class implementing a local channel to create faces
@@ -60,8 +60,7 @@ public:
    * needs to explicitly call DtnChannel::listen method.
    */
   explicit
-  DtnChannel(const ibrdtn::Endpoint& endpoint, uint16_t port);
-  //DtnChannel();
+  DtnChannel(const std::string &endpointPrefix, const std::string &endpointAffix, const std::string &ibrdtnHost, uint16_t ibrdtndPort);
 
   ~DtnChannel() DECL_OVERRIDE;
 
@@ -76,13 +75,24 @@ public:
    */
   void
   listen(const FaceCreatedCallback& onFaceCreated,
-         const FaceCreationFailedCallback& onAcceptFailed);//,
+         const FaceCreationFailedCallback& onReceiveFailed);
          //int backlog);
 
   bool
   isListening() const;
+  void
+  processBundle(const dtn::data::Bundle &b, const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed);
 
-private:
+  void
+  connect(const std::string &remoteEndpoint,
+          ndn::nfd::FacePersistency persistency,
+          const FaceCreatedCallback& onFaceCreated,
+          const FaceCreationFailedCallback& onConnectFailed);
+
+  std::pair<bool, shared_ptr<Face>>
+  createFace(const std::string &remoteEndpoint, ndn::nfd::FacePersistency persistency);
+
+  private:
   void
   accept(const FaceCreatedCallback& onFaceCreated,
          const FaceCreationFailedCallback& onAcceptFailed);
@@ -93,10 +103,18 @@ private:
                const FaceCreationFailedCallback& onAcceptFailed);
 
 private:
-  ibrdtn::Endpoint m_endpoint;
-  uint16_t m_port;
+  std::string m_endpointPrefix;
+  std::string m_endpointAffix;
+  std::string m_ibrdtnHost;
+  uint16_t m_ibrdtndPort;
+
+  std::string m_remoteEndpoint;
+
   bool m_is_open;
-  std::map<ibrdtn::Endpoint, shared_ptr<Face>> m_channelFaces;
+  // std::map<ibrdtn::Endpoint, shared_ptr<Face>> m_channelFaces;
+  std::map<std::string, shared_ptr<Face>> m_channelFaces;
+
+  AsyncIbrDtnClient *m_pIbrDtnClient;
 
   //boost::asio::ip::tcp::acceptor m_acceptor;
   //boost::asio::ip::tcp::socket m_acceptSocket;
@@ -109,6 +127,31 @@ DtnChannel::isListening() const
   //return m_acceptor.is_open();
 }
 
+	// typedef std::function< void(dtn::data::Bundle &b) > BundleReceivedCallback;
+class AsyncIbrDtnClient : public dtn::api::Client
+{
+public:
+	AsyncIbrDtnClient(const std::string &app, const std::string &host, uint16_t port, DtnChannel *pChannel,
+			const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed);
+
+	virtual ~AsyncIbrDtnClient();
+
+protected:
+	/**
+	 * In this API bundles are received asynchronous. To receive bundles it is necessary
+	 * to overload the Client::received()-method. This will be call on a incoming bundles
+	 * by another thread.
+	 */
+	// void received(const dtn::data::Bundle &b);
+	virtual void received(const dtn::data::Bundle &b);
+
+	ibrcommon::vaddress m_ibrdtndAddress;
+	ibrcommon::socketstream m_socketStream;
+
+	DtnChannel *m_pChannel;
+	FaceCreatedCallback OnFaceCreated;
+	FaceCreationFailedCallback OnReceiveFailed;
+};
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_DTN_CHANNEL_HPP

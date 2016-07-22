@@ -32,11 +32,13 @@
 #include <iostream>
 #include <stdint.h>
 
+/*
 #ifdef SWIG
 #    define DEPRECATED
 #else
 #    define DEPRECATED  __attribute__ ((deprecated))
 #endif
+*/
 
 namespace dtn
 {

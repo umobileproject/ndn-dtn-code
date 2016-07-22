@@ -903,9 +903,29 @@ void
 FaceManager::processSectionDtn(const ConfigSection& configSection, bool isDryRun)
 {
   /*std::string path = "/usr/local/etc/ibrdtnd.conf";*/
+  std::string ibrdtndHost = "localhost";
+  uint16_t ibrdtndPort = 4550;
+  std::string endpointPrefix = "";
+  std::string endpointAffix = "nfd";
 
-  uint16_t endpointId = 2;
-  uint16_t port = 5050;
+  for (const auto& i : configSection) {
+	  if (i.first == "host") {
+		  ibrdtndHost = i.second.get_value<std::string>();
+		  NFD_LOG_TRACE("IBRDTND host set to " << ibrdtndHost);
+	  }
+	  else if (i.first == "port") {
+		  ibrdtndPort = ConfigFile::parseNumber<uint16_t>(i, "dtn");
+		  NFD_LOG_TRACE("IBRDTND port set to " << ibrdtndPort);
+	  }
+	  else if (i.first == "endpointPrefix") {
+		  endpointPrefix = i.second.get_value<std::string>();
+		  NFD_LOG_TRACE("IBRDTND endpoint prefix set to " << endpointPrefix);
+	  }
+	  else if (i.first == "endpointAffix") {
+		  endpointAffix = i.second.get_value<std::string>();
+		  NFD_LOG_TRACE("IBRDTND endpoint affix set to " << endpointAffix);
+	  }
+  }
 
   if (!isDryRun) {
     if (m_factories.count("dtn") > 0) {
@@ -915,9 +935,11 @@ FaceManager::processSectionDtn(const ConfigSection& configSection, bool isDryRun
     //auto factory = make_shared<DtnFactory>();
     shared_ptr<DtnFactory> factory = make_shared<DtnFactory>();
     m_factories.insert(std::make_pair("dtn", factory));
-    //dtn::Endpoint endpoint(boost::asio::ip::address_v4::any(), port);
-    ibrdtn::Endpoint endpoint(endpointId);
-    shared_ptr<DtnChannel> dtnChannel = factory->createChannel(endpoint, port);
+    // dtn::Endpoint endpoint(boost::asio::ip::address_v4::any(), port);
+    // uint16_t endpointId = 2;
+    // ibrdtn::Endpoint endpoint(endpointId);
+    // shared_ptr<DtnChannel> dtnChannel = factory->createChannel(endpoint, port);
+    shared_ptr<DtnChannel> dtnChannel = factory->createChannel(endpointPrefix, endpointAffix, ibrdtndHost, ibrdtndPort);
     //auto channel = factory->createChannel(path);
     dtnChannel->listen(bind(&FaceTable::add, &m_faceTable, _1), nullptr);
     NFD_LOG_INFO("DTN setup finished");

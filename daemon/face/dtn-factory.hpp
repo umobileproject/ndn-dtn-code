@@ -59,8 +59,9 @@ public:
    *
    * \throws DtnFactory::Error
    */
+
   shared_ptr<DtnChannel>
-  createChannel(const ibrdtn::Endpoint& localEndpoint, uint16_t port);
+  createChannel(const std::string &endpointPrefix, const std::string &endpointAffix, const std::string ibrdtndHost, uint16_t ibrdtndPort);
 
 public: // from ProtocolFactory
   virtual void
@@ -79,12 +80,14 @@ private:
    * \returns shared pointer to the existing DtnChannel object
    *          or empty shared pointer when such channel does not exist
    */
-  shared_ptr<DtnChannel>
+
   //findChannel() const;
-  findChannel(const ibrdtn::Endpoint& endpoint) const;
+
+  shared_ptr<DtnChannel>
+  findChannel(const std::string &endpointAffix) const;
 
 private:
-  std::map<ibrdtn::Endpoint, shared_ptr<DtnChannel>> m_channels;
+  std::map<std::string, shared_ptr<DtnChannel>> m_channels;
 };
 
 } // namespace nfd

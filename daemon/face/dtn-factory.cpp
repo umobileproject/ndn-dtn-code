@@ -27,15 +27,14 @@
 namespace nfd {
 
 shared_ptr<DtnChannel>
-//DtnFactory::createChannel(const std::string& dtnPath)
-DtnFactory::createChannel(const ibrdtn::Endpoint& endpoint, uint16_t port)
+DtnFactory::createChannel(const std::string &endpointPrefix, const std::string &endpointAffix, const std::string ibrdtndHost, uint16_t ibrdtndPort)
 {
-  auto channel = findChannel(endpoint);
+  auto channel = findChannel(endpointAffix);
   if (channel)
     return channel;
 
-  channel = make_shared<DtnChannel>(endpoint, port);
-  m_channels[endpoint] = channel;
+  channel = make_shared<DtnChannel>(endpointPrefix, endpointAffix, ibrdtndHost, ibrdtndPort);
+  m_channels[endpointAffix] = channel;
   return channel;
 }
 
@@ -45,7 +44,19 @@ DtnFactory::createFace(const FaceUri& uri,
                               const FaceCreatedCallback& onCreated,
                               const FaceCreationFailedCallback& onConnectFailed)
 {
-  BOOST_THROW_EXCEPTION(Error("DtnFactory 'createFace' not implemented"));
+  // BOOST_THROW_EXCEPTION(Error("DtnFactory 'createFace' not implemented"));
+  std::string dtnEndpoint = uri.getHost() + "/" + uri.getPort();
+  std::string dtnAffix = uri.getPort();
+
+  // very simple logic for now
+  for (const auto& i : m_channels) {
+	if (i.first == dtnAffix ) {
+	  i.second->connect(dtnEndpoint, persistency, onCreated, onConnectFailed);
+	  return;
+	}
+  }
+
+  onConnectFailed("No channels available to connect to " + dtnEndpoint);
 }
 
 std::vector<shared_ptr<const Channel>>
@@ -61,9 +72,9 @@ DtnFactory::getChannels() const
 }
 
 shared_ptr<DtnChannel>
-DtnFactory::findChannel(const ibrdtn::Endpoint& endpoint) const
+DtnFactory::findChannel(const std::string &endpointAffix) const
 {
-  auto i = m_channels.find(endpoint);
+  auto i = m_channels.find(endpointAffix);
   if (i != m_channels.end())
     return i->second;
   else

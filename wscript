@@ -128,6 +128,8 @@ main(int, char**)
     #if conf.options.with_ibrcommon:
     conf.env['WITH_IBRCOMMON'] = 1
     conf.load('ibrcommon')
+    conf.check_cxx(header_name='ibrcommon-1.0/ibrcommon/ibrcommon.h', cxxflags='-Wno-error',
+                   mandatory=False, use='LIBIBRCOMMON')
     #if conf.options.with_ibrdtn:
     conf.env['WITH_IBRDTN'] = 1
     conf.load('ibrdtn')
@@ -235,6 +237,7 @@ def build(bld):
     if bld.env['WITH_IBRDTN']:
         nfd_objects.source += bld.path.ant_glob('daemon/face/dtn-*.cpp')
         nfd_objects.use += ' LIBIBRDTN'
+        nfd_objects.use += ' LIBIBRCOMMON'
         
 
     rib_objects = bld(

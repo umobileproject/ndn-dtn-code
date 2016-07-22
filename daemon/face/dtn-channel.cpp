@@ -24,42 +24,22 @@
  */
 
 #include "dtn-channel.hpp"
-
+#include <string>
 #include <sys/stat.h> // for chmod()
+#include "generic-link-service.hpp"
 
 namespace nfd {
 
 NFD_LOG_INIT("DtnChannel");
 
-//DtnChannel::DtnChannel()
-DtnChannel::DtnChannel(const ibrdtn::Endpoint& endpoint, uint16_t port)
-  : m_endpoint(endpoint)
-  , m_port(port)
+DtnChannel::DtnChannel(const std::string &endpointPrefix, const std::string &endpointAffix, const std::string &ibrdtnHost, uint16_t ibrdtndPort)
+  : m_endpointPrefix(endpointPrefix), m_endpointAffix(endpointAffix), m_ibrdtnHost(ibrdtnHost), m_ibrdtndPort(ibrdtndPort)
 {
-  const std::string& scheme("CBHE");
+  // const std::string& scheme("CBHE");
 
   m_is_open = false;
-  dtn::data::SDNV<long unsigned int> eid(endpoint);
-  dtn::data::SDNV<long unsigned int> app(1);
-
-  dtn::data::Number node(eid);
-  dtn::data::Number application(app);
-
-  //dtn::data::EID eID;
-
-  //eID.setApplication(application);
-  dtn::data::EID eID(node, application);
-
-  //const dtn::data::EID eID(scheme);
-
-  //const dtn::data::EID& eID();
-  if (eID.isNone())
-  {
-    return;
-  }
-
-
-  setUri(FaceUri(m_endpoint, m_port));
+  m_pIbrDtnClient = nullptr;
+  setUri(FaceUri(m_endpointPrefix, m_endpointAffix));
 }
 
 DtnChannel::~DtnChannel()
@@ -70,6 +50,9 @@ DtnChannel::~DtnChannel()
     //boost::system::error_code error;
     //m_acceptor.close(error);
     NFD_LOG_DEBUG(" Removing dtn socket");
+    if (m_pIbrDtnClient != nullptr)
+    	delete m_pIbrDtnClient;
+
     m_is_open = false;
     //boost::filesystem::remove(m_endpoint.path(), error);
   }
@@ -77,21 +60,109 @@ DtnChannel::~DtnChannel()
 
 void
 DtnChannel::listen(const FaceCreatedCallback& onFaceCreated,
-                          const FaceCreationFailedCallback& onAcceptFailed)
+                          const FaceCreationFailedCallback& onReceiveFailed)
                           //int backlog/* = acceptor::max_connections*/)
 {
   if (isListening()) {
-    NFD_LOG_WARN("[" << m_endpoint << "] Already listening");
+    NFD_LOG_WARN("[" << m_endpointAffix << "] Already listening");
     return;
   }
   m_is_open = true;
 
-  //m_acceptor.open();
-  //m_acceptor.bind(m_endpoint);
-  //m_acceptor.listen(backlog);
 
-  // start accepting connections
-  accept(onFaceCreated, onAcceptFailed);
+  m_pIbrDtnClient = new nfd::AsyncIbrDtnClient(m_endpointAffix, m_ibrdtnHost, m_ibrdtndPort, this, onFaceCreated, onReceiveFailed);
+
+}
+
+void
+DtnChannel::processBundle(const dtn::data::Bundle &b, const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed)
+{
+	// Do bundle processing
+	m_remoteEndpoint = b.source.getString();
+
+	NFD_LOG_INFO("DTN bundle received from " << m_remoteEndpoint);
+	NFD_LOG_DEBUG("[" << m_endpointAffix << "] New peer " << m_remoteEndpoint);
+
+	bool isCreated = false;
+	shared_ptr<Face> face;
+	std::tie(isCreated, face) = createFace(m_remoteEndpoint, ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
+
+	if (face == nullptr)
+	{
+		NFD_LOG_WARN("[" << m_endpointAffix << "] Failed to create face for peer " << m_remoteEndpoint);
+		if (onReceiveFailed)
+		  onReceiveFailed(m_remoteEndpoint);
+		return;
+	}
+
+	if (isCreated)
+		onFaceCreated(face);
+
+	// dispatch the datagram to the face for processing
+	// static_cast<face::UnicastUdpTransport*>(face->getTransport())->receiveDatagram(m_inputBuffer, nBytesReceived, error);
+}
+
+void
+DtnChannel::connect(const std::string &remoteEndpoint,
+                    ndn::nfd::FacePersistency persistency,
+                    const FaceCreatedCallback& onFaceCreated,
+                    const FaceCreationFailedCallback& onConnectFailed)
+{
+  shared_ptr<Face> face;
+  face = createFace(remoteEndpoint, persistency).second;
+  if (face == nullptr)
+  {
+    NFD_LOG_WARN("[" << m_endpointAffix << "] Connect failed");
+    if (onConnectFailed)
+      onConnectFailed(remoteEndpoint);
+    return;
+  }
+
+  // Need to invoke the callback regardless of whether or not we had already
+  // created the face so that control responses and such can be sent
+  onFaceCreated(face);
+}
+
+std::pair<bool, shared_ptr<Face>>
+DtnChannel::createFace(const std::string& remoteEndpoint, ndn::nfd::FacePersistency persistency)
+{
+  auto it = m_channelFaces.find(remoteEndpoint);
+  if (it != m_channelFaces.end()) {
+    // we already have a face for this endpoint, just reuse it
+    auto face = it->second;
+    // only on-demand -> persistent -> permanent transition is allowed
+    /*
+    bool isTransitionAllowed = persistency != face->getPersistency() &&
+                               (face->getPersistency() == ndn::nfd::FACE_PERSISTENCY_ON_DEMAND ||
+                                persistency == ndn::nfd::FACE_PERSISTENCY_PERMANENT);
+    if (isTransitionAllowed) {
+      face->setPersistency(persistency);
+    }
+    */
+    return {false, face};
+  }
+
+  // else, create a new face
+/*
+  ip::udp::socket socket(getGlobalIoService(), m_localEndpoint.protocol());
+  socket.set_option(ip::udp::socket::reuse_address(true));
+  socket.bind(m_localEndpoint);
+  socket.connect(remoteEndpoint);
+
+  auto linkService = make_unique<face::GenericLinkService>();
+  auto transport = make_unique<face::UnicastUdpTransport>(std::move(socket), persistency, 10);
+  auto face = make_shared<Face>(std::move(linkService), std::move(transport));
+
+  face->setPersistency(persistency);
+
+  m_channelFaces[remoteEndpoint] = face;
+  connectFaceClosedSignal(*face,
+    [this, remoteEndpoint] {
+      NFD_LOG_TRACE("Erasing " << remoteEndpoint << " from channel face map");
+      m_channelFaces.erase(remoteEndpoint);
+    });
+  */
+  return {true, nullptr};
 }
 
 void
@@ -129,4 +200,35 @@ DtnChannel::handleAccept(const boost::system::error_code& error,
   accept(onFaceCreated, onAcceptFailed);
 }
 
+
+AsyncIbrDtnClient::AsyncIbrDtnClient(const std::string &app, const std::string &host, uint16_t port, DtnChannel *pChannel,
+	const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed) :
+		dtn::api::Client(app, m_socketStream), m_ibrdtndAddress(host, port), m_socketStream(new ibrcommon::tcpsocket(m_ibrdtndAddress))
+{
+	NFD_LOG_INFO("AsyncIbrDtnClient constructor");
+
+	m_pChannel = pChannel;
+	OnFaceCreated = onFaceCreated;
+	OnReceiveFailed = onReceiveFailed;
+
+	connect();
+	/*
+	dtn::data::Bundle b = getBundle();
+	ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
+	*/
+}
+
+AsyncIbrDtnClient::~AsyncIbrDtnClient()
+{
+	NFD_LOG_INFO("AsyncIbrDtnClient destructor");
+}
+
+void
+AsyncIbrDtnClient::received(const dtn::data::Bundle &b)
+{
+	NFD_LOG_INFO("AsyncIbrDtnClient received bundle");
+	// std::cout << "Bundle Received!" << std::endl;
+	m_pChannel->processBundle(b, OnFaceCreated, OnReceiveFailed);
+}
 } // namespace nfd
+

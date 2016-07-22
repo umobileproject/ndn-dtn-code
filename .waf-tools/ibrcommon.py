@@ -8,7 +8,7 @@ from waflib import Options
 
 def addIbrcommonOptions(self, opt):
     opt.add_option('--with-ibrcommon', action='store_true', default=False,
-                   dest='with_ibrcommon', help='''Enable IBR-common support''')
+                   dest='enable_ibrcommon', help='''Enable IBR-common support''')
 setattr(Options.OptionsContext, "addIbrcommonOptions", addIbrcommonOptions)
 
 def configure(conf):
