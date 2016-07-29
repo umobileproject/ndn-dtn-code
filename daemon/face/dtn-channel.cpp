@@ -24,6 +24,7 @@
  */
 
 #include "dtn-channel.hpp"
+#include "dtn-transport.hpp"
 #include <string>
 #include <sys/stat.h> // for chmod()
 #include "generic-link-service.hpp"
@@ -78,20 +79,20 @@ void
 DtnChannel::processBundle(const dtn::data::Bundle &b, const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed)
 {
 	// Do bundle processing
-	m_remoteEndpoint = b.source.getString();
+	std::string remoteEndpoint = b.source.getString();
 
-	NFD_LOG_INFO("DTN bundle received from " << m_remoteEndpoint);
-	NFD_LOG_DEBUG("[" << m_endpointAffix << "] New peer " << m_remoteEndpoint);
+	NFD_LOG_INFO("DTN bundle received from " << remoteEndpoint);
+	NFD_LOG_DEBUG("[" << m_endpointAffix << "] New peer " << remoteEndpoint);
 
 	bool isCreated = false;
 	shared_ptr<Face> face;
-	std::tie(isCreated, face) = createFace(m_remoteEndpoint, ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
+	std::tie(isCreated, face) = createFace(remoteEndpoint, ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
 
 	if (face == nullptr)
 	{
-		NFD_LOG_WARN("[" << m_endpointAffix << "] Failed to create face for peer " << m_remoteEndpoint);
+		NFD_LOG_WARN("[" << m_endpointAffix << "] Failed to create face for peer " << remoteEndpoint);
 		if (onReceiveFailed)
-		  onReceiveFailed(m_remoteEndpoint);
+		  onReceiveFailed(remoteEndpoint);
 		return;
 	}
 
@@ -143,14 +144,10 @@ DtnChannel::createFace(const std::string& remoteEndpoint, ndn::nfd::FacePersiste
   }
 
   // else, create a new face
-/*
-  ip::udp::socket socket(getGlobalIoService(), m_localEndpoint.protocol());
-  socket.set_option(ip::udp::socket::reuse_address(true));
-  socket.bind(m_localEndpoint);
-  socket.connect(remoteEndpoint);
 
   auto linkService = make_unique<face::GenericLinkService>();
-  auto transport = make_unique<face::UnicastUdpTransport>(std::move(socket), persistency, 10);
+  std::string localEndpoint = m_endpointPrefix + m_endpointAffix;
+  auto transport = make_unique<face::DtnTransport>(localEndpoint, remoteEndpoint, m_ibrdtnHost, m_ibrdtndPort );
   auto face = make_shared<Face>(std::move(linkService), std::move(transport));
 
   face->setPersistency(persistency);
@@ -161,8 +158,8 @@ DtnChannel::createFace(const std::string& remoteEndpoint, ndn::nfd::FacePersiste
       NFD_LOG_TRACE("Erasing " << remoteEndpoint << " from channel face map");
       m_channelFaces.erase(remoteEndpoint);
     });
-  */
-  return {true, nullptr};
+
+  return {true, face};
 }
 
 void

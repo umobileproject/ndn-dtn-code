@@ -108,8 +108,6 @@ private:
   std::string m_ibrdtnHost;
   uint16_t m_ibrdtndPort;
 
-  std::string m_remoteEndpoint;
-
   bool m_is_open;
   // std::map<ibrdtn::Endpoint, shared_ptr<Face>> m_channelFaces;
   std::map<std::string, shared_ptr<Face>> m_channelFaces;

@@ -16,11 +16,12 @@ namespace face {
 
 NFD_LOG_INIT("DtnTransport");
 
-DtnTransport::DtnTransport(std::string localPrefix, std::string localAffix, std::string remotePrefix, std::string remoteAffix, std::string ibrdtndHost, std::string ibrdtndPort):
+DtnTransport::DtnTransport(std::string localEndpoint, std::string remoteEndpoint, std::string ibrdtndHost, uint16_t ibrdtndPort):
 		  m_ibrdtndHost(ibrdtndHost), m_ibrdtndPort(ibrdtndPort)
 {
-  this->setLocalUri(FaceUri(localPrefix, localAffix));
-  this->setRemoteUri(FaceUri(remotePrefix, remoteAffix));
+
+  this->setLocalUri(FaceUri(localEndpoint));
+  this->setRemoteUri(FaceUri(remoteEndpoint));
   this->setScope(ndn::nfd::FACE_SCOPE_NON_LOCAL);
   this->setPersistency(ndn::nfd::FACE_PERSISTENCY_PERSISTENT);
   this->setLinkType(ndn::nfd::LINK_TYPE_POINT_TO_POINT);

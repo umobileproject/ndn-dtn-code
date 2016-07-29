@@ -18,7 +18,7 @@ namespace face {
 class DtnTransport : public Transport
 {
 public:
-  DtnTransport(std::string localPrefix, std::string localAffix, std::string remotePrefix, std::string remoteAffix, std::string ibrdtndHost, std::string ibrdtndPort);
+  DtnTransport(std::string localEndpoint, std::string remoteEndpoint, std::string ibrdtndHost, uint16_t ibrdtndPort);
 
   void
   receiveBundle(const dtn::data::Bundle &b);
@@ -35,7 +35,7 @@ private:
   doSend(Transport::Packet&& packet) DECL_OVERRIDE;
 
   std::string m_ibrdtndHost;
-  std::string m_ibrdtndPort;
+  uint16_t m_ibrdtndPort;
 };
 
 } // namespace face

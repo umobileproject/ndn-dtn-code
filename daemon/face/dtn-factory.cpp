@@ -45,8 +45,8 @@ DtnFactory::createFace(const FaceUri& uri,
                               const FaceCreationFailedCallback& onConnectFailed)
 {
   // BOOST_THROW_EXCEPTION(Error("DtnFactory 'createFace' not implemented"));
-  std::string dtnEndpoint = uri.getHost() + "/" + uri.getPort();
-  std::string dtnAffix = uri.getPort();
+  std::string dtnEndpoint = uri.getScheme() + "://" + uri.getHost() + uri.getPath();
+  std::string dtnAffix = uri.getPath();
 
   // very simple logic for now
   for (const auto& i : m_channels) {
