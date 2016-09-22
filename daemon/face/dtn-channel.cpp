@@ -85,7 +85,22 @@ DtnChannel::processBundle(const dtn::data::Bundle &b, const FaceCreatedCallback&
 	NFD_LOG_DEBUG("[" << m_endpointAffix << "] New peer " << remoteEndpoint);
 
 	bool isCreated = false;
-	shared_ptr<Face> face;
+	shared_ptr<Face> face = nullptr;
+
+	/*
+	try
+	{
+		std::tie(isCreated, face) = createFace(remoteEndpoint, ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
+	} catch (const boost::system::system_error& e)
+	{
+	    NFD_LOG_WARN("[" << m_endpointPrefix << m_endpointAffix << "] Failed to create face for peer "
+	                 << m_endpointPrefix << m_endpointAffix << ": " << e.what());
+	    if (onReceiveFailed)
+	      onReceiveFailed(e.what());
+	    return;
+	}
+	 */
+
 	std::tie(isCreated, face) = createFace(remoteEndpoint, ndn::nfd::FACE_PERSISTENCY_ON_DEMAND);
 
 	if (face == nullptr)
@@ -99,8 +114,9 @@ DtnChannel::processBundle(const dtn::data::Bundle &b, const FaceCreatedCallback&
 	if (isCreated)
 		onFaceCreated(face);
 
-	// dispatch the datagram to the face for processing
-	// static_cast<face::UnicastUdpTransport*>(face->getTransport())->receiveDatagram(m_inputBuffer, nBytesReceived, error);
+	ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
+	// dispatch the bundle to the face for processing
+	static_cast<face::DtnTransport*>(face->getTransport())->receiveBundle(b);
 }
 
 void
@@ -130,7 +146,7 @@ DtnChannel::createFace(const std::string& remoteEndpoint, ndn::nfd::FacePersiste
   auto it = m_channelFaces.find(remoteEndpoint);
   if (it != m_channelFaces.end()) {
     // we already have a face for this endpoint, just reuse it
-    auto face = it->second;
+	auto face = it->second;
     // only on-demand -> persistent -> permanent transition is allowed
     /*
     bool isTransitionAllowed = persistency != face->getPersistency() &&
