@@ -27,6 +27,8 @@ DtnTransport::DtnTransport(std::string localEndpoint, std::string remoteEndpoint
   this->setPersistency(ndn::nfd::FACE_PERSISTENCY_PERSISTENT);
   this->setLinkType(ndn::nfd::LINK_TYPE_POINT_TO_POINT);
   this->setMtu(MTU_UNLIMITED);
+
+  NFD_LOG_FACE_INFO("Creating DTN transport");
 }
 
 void
@@ -67,39 +69,51 @@ DtnTransport::doClose()
 void
 DtnTransport::doSend(Transport::Packet&& packet)
 {
-  ibrcommon::vaddress ibrdtndAddress(m_ibrdtndHost, m_ibrdtndPort);
-  ibrcommon::socketstream ibrdtnSocketStream(new ibrcommon::tcpsocket(ibrdtndAddress));
+  try {
 
-  // Initiate a client for sending
-  dtn::api::Client client(getLocalUri().getHost(), ibrdtnSocketStream, dtn::api::Client::MODE_SENDONLY);
+	  ibrcommon::vaddress ibrdtndAddress(m_ibrdtndHost, m_ibrdtndPort);
+	  ibrcommon::socketstream ibrdtnSocketStream(new ibrcommon::tcpsocket(ibrdtndAddress));
 
-  // create an empty BLOB
-  ibrcommon::BLOB::Reference ref = ibrcommon::BLOB::create();
+	  std::string localURI = getLocalUri().toString();
+	  std::string localHost = getLocalUri().getHost();
+	  std::string ibrdtnHost = m_ibrdtndHost;
 
-  // copy cin to a BLOB
-  (*ref.iostream()) << packet.packet.getBuffer();
+	  // Initiate a client for sending
+	  dtn::api::Client client(getLocalUri().getPath().substr(1), ibrdtnSocketStream, dtn::api::Client::MODE_SENDONLY);
+	  client.connect();
 
-  dtn::data::Bundle b;
+	  // create an empty BLOB
+	  ibrcommon::BLOB::Reference ref = ibrcommon::BLOB::create();
 
-  std::string host = getRemoteUri().getHost();
-  std::string port = getRemoteUri().getPath();
-  std::string destinationAddress = getRemoteUri().getScheme() + "://" + getRemoteUri().getHost() + getRemoteUri().getPath();
-  // set the destination
-  // dtn::data::EID eid("dtn://ubuntu2/nfd");
+	  // copy cin to a BLOB
+	  (*ref.iostream()) << packet.packet.getBuffer();
 
-  b.destination = destinationAddress;
+	  dtn::data::Bundle b;
 
-  int tmp = 0;
-  tmp++;
+	  std::string host = getRemoteUri().getHost();
+	  std::string port = getRemoteUri().getPath();
+	  std::string destinationAddress = getRemoteUri().getScheme() + "://" + getRemoteUri().getHost() + getRemoteUri().getPath();
+	  // set the destination
+	  // dtn::data::EID eid("dtn://ubuntu2/nfd");
 
-  // add payload block with the reference
-  b.push_back(ref);
+	  b.destination = destinationAddress;
 
-  client << b;
+	  // add payload block with the reference
+	  b.push_back(ref);
 
-  client.flush();
-  client.close();
+	  client << b;
+
+	  client.flush();
+	  client.close();
+
+	  ibrdtnSocketStream.close();
+  }catch (const ibrcommon::IOException &ex)
+  {
+	  NFD_LOG_INFO("IBR-DTN Error: " << ex.what());
+	  // connection already closed, the daemon was faster
+  }
 }
+
 
 } // namespace face
 } // namespace nfd
