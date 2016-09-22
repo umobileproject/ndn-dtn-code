@@ -6,7 +6,8 @@
  */
 
 #include "dtn-transport.hpp"
-#include <ibrdtn/data/EID.h>
+// #include <ibrdtn/data/EID.h>
+#include <ibrcommon/data/BLOB.h>
 #include <ibrdtn/api/Client.h>
 #include <ibrcommon/net/socket.h>
 #include <ibrcommon/net/socketstream.h>
@@ -80,8 +81,16 @@ DtnTransport::doSend(Transport::Packet&& packet)
 
   dtn::data::Bundle b;
 
+  std::string host = getRemoteUri().getHost();
+  std::string port = getRemoteUri().getPath();
+  std::string destinationAddress = getRemoteUri().getScheme() + "://" + getRemoteUri().getHost() + getRemoteUri().getPath();
   // set the destination
-  b.destination = dtn::data::EID(getRemoteUri().getHost() + "/" + getRemoteUri().getPort());
+  // dtn::data::EID eid("dtn://ubuntu2/nfd");
+
+  b.destination = destinationAddress;
+
+  int tmp = 0;
+  tmp++;
 
   // add payload block with the reference
   b.push_back(ref);

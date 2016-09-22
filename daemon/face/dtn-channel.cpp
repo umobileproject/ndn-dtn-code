@@ -69,9 +69,9 @@ DtnChannel::listen(const FaceCreatedCallback& onFaceCreated,
     return;
   }
   m_is_open = true;
+  std::string app = m_endpointAffix.substr(1); // Remove leading '/'
 
-
-  m_pIbrDtnClient = new nfd::AsyncIbrDtnClient(m_endpointAffix, m_ibrdtnHost, m_ibrdtndPort, this, onFaceCreated, onReceiveFailed);
+  m_pIbrDtnClient = new nfd::AsyncIbrDtnClient(app, m_ibrdtnHost, m_ibrdtndPort, this, onFaceCreated, onReceiveFailed);
 
 }
 
