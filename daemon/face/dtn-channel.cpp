@@ -76,7 +76,7 @@ DtnChannel::listen(const FaceCreatedCallback& onFaceCreated,
 }
 
 void
-DtnChannel::processBundle(const dtn::data::Bundle &b, const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed)
+DtnChannel::processBundle(dtn::data::Bundle b, const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed)
 {
 	// Do bundle processing
 	std::string remoteEndpoint = b.source.getString();
@@ -114,7 +114,10 @@ DtnChannel::processBundle(const dtn::data::Bundle &b, const FaceCreatedCallback&
 	if (isCreated)
 		onFaceCreated(face);
 
-	ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
+	// ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
+	// std::cout << ref.iostream()->rdbuf();
+
+	//ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
 	// dispatch the bundle to the face for processing
 	static_cast<face::DtnTransport*>(face->getTransport())->receiveBundle(b);
 }
@@ -156,6 +159,7 @@ DtnChannel::createFace(const std::string& remoteEndpoint, ndn::nfd::FacePersiste
       face->setPersistency(persistency);
     }
     */
+	face->setPersistency(persistency);
     return {false, face};
   }
 
@@ -218,7 +222,7 @@ AsyncIbrDtnClient::AsyncIbrDtnClient(const std::string &app, const std::string &
 	const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed) :
 		dtn::api::Client(app, m_socketStream), m_ibrdtndAddress(host, port), m_socketStream(new ibrcommon::tcpsocket(m_ibrdtndAddress))
 {
-	NFD_LOG_INFO("AsyncIbrDtnClient constructor");
+	NFD_LOG_INFO("AsyncIbrDtnClient CONSTRUCTOR");
 
 	m_pChannel = pChannel;
 	OnFaceCreated = onFaceCreated;
@@ -233,15 +237,27 @@ AsyncIbrDtnClient::AsyncIbrDtnClient(const std::string &app, const std::string &
 
 AsyncIbrDtnClient::~AsyncIbrDtnClient()
 {
-	NFD_LOG_INFO("AsyncIbrDtnClient destructor");
+	NFD_LOG_INFO("AsyncIbrDtnClient DESTRUCTOR");
 }
 
 void
 AsyncIbrDtnClient::received(const dtn::data::Bundle &b)
 {
-	NFD_LOG_INFO("AsyncIbrDtnClient received bundle");
+	NFD_LOG_INFO("AsyncIbrDtnClient RECEIVE BUNDLE");
 	// std::cout << "Bundle Received!" << std::endl;
+	// ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
+	// std::cout << ref.iostream()->rdbuf();
+
 	m_pChannel->processBundle(b, OnFaceCreated, OnReceiveFailed);
+	// connect();
 }
+
+void AsyncIbrDtnClient::eventConnectionDown() throw ()
+{
+	NFD_LOG_INFO("AsyncIbrDtnClient receiver connection down!");
+
+	Client::eventConnectionDown();
+}
+
 } // namespace nfd
 

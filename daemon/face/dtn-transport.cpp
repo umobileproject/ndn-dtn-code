@@ -32,15 +32,49 @@ DtnTransport::DtnTransport(std::string localEndpoint, std::string remoteEndpoint
 }
 
 void
-DtnTransport::receiveBundle(const dtn::data::Bundle &b)
+DtnTransport::receiveBundle(dtn::data::Bundle b)
 {
-  NFD_LOG_FACE_TRACE("Received: " << b.getPayloadLength() << " payload bytes");
+  NFD_LOG_FACE_INFO("Received: " << b.getPayloadLength() << " payload bytes");
 
   bool isOk = false;
 
   ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
 
-  Block element(ref.iostream()->rdbuf(), ref.iostream()->rdbuf()->in_avail());
+  std::stringstream buffer;
+  buffer << ref.iostream()->rdbuf();
+  std::string stringbuffer = buffer.str();
+
+  auto ndnBuffer = std::make_shared<ndn::Buffer>(stringbuffer.begin(), stringbuffer.end());
+
+  // auto buffer = std::make_shared<ndn::Buffer>();
+  // ref.iostream()->rdbuf(), (size_t) b.getPayloadLength()
+  // std::shared_ptr<ndn::Buffer> buffer = make_shared (ref.iostream()->rdbuf(), (size_t) b.getPayloadLength());
+  ndn::ConstBufferPtr constBuffer = ndnBuffer;
+  // cout << buffer;
+  // ndn::Buffer pBuffer;
+  // std::stringstream buffer;
+  // buffer << ref.iostream()->rdbuf();
+  // std::string stringbuffer = buffer.str();
+
+  //stringbuffer << buffer;
+
+  NFD_LOG_FACE_INFO("Bundle payload:" << ref.iostream()->rdbuf() << std::flush);
+
+  // std::cout << ref.iostream()->rdbuf();
+  // dtn::data::PayloadBlock &p = b.getBlock<dtn::data::PayloadBlock>();
+  // ibrcommon::BLOB::iostream stream = p.getBLOB().iostream();
+
+  // std::iostream stream = ref.iostream()->rdbuf();
+  // char *pBuffer = new char[b.getPayloadLength()];
+  // *pBuffer << ref.iostream()->rdbuf();
+
+  Block element;
+  // element.getBuffer() << ref.iostream()->rdbuf();
+  std::tie(isOk, element) = Block::fromBuffer(constBuffer, b.getPayloadLength());
+
+  // std::istream stream;
+  // stream << ref.iostream()->rdbuf();
+  // element = Block::fromStream(stream);
 
   if (!isOk) {
 	NFD_LOG_FACE_WARN("Failed to parse incoming packet");

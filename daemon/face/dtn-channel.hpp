@@ -81,7 +81,7 @@ public:
   bool
   isListening() const;
   void
-  processBundle(const dtn::data::Bundle &b, const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed);
+  processBundle(dtn::data::Bundle b, const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed);
 
   void
   connect(const std::string &remoteEndpoint,
@@ -133,6 +133,7 @@ public:
 			const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed);
 
 	virtual ~AsyncIbrDtnClient();
+	virtual void eventConnectionDown() throw ();
 
 protected:
 	/**

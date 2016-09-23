@@ -21,7 +21,7 @@ public:
   DtnTransport(std::string localEndpoint, std::string remoteEndpoint, std::string ibrdtndHost, uint16_t ibrdtndPort);
 
   void
-  receiveBundle(const dtn::data::Bundle &b);
+  receiveBundle(dtn::data::Bundle b);
 
 protected:
   virtual void
