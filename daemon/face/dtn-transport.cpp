@@ -34,57 +34,60 @@ DtnTransport::DtnTransport(std::string localEndpoint, std::string remoteEndpoint
 void
 DtnTransport::receiveBundle(dtn::data::Bundle b)
 {
-  NFD_LOG_FACE_INFO("Received: " << b.getPayloadLength() << " payload bytes");
+	  NFD_LOG_FACE_INFO("Received: " << b.getPayloadLength() << " payload bytes");
 
-  bool isOk = false;
+	  bool isOk = false;
 
-  ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
+	  ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
 
-  std::stringstream buffer;
-  buffer << ref.iostream()->rdbuf();
-  std::string stringbuffer = buffer.str();
+	  std::stringstream buffer;
+	  buffer << ref.iostream()->rdbuf();
+	  std::string stringbuffer = buffer.str();
 
-  auto ndnBuffer = std::make_shared<ndn::Buffer>(stringbuffer.begin(), stringbuffer.end());
+	  const uint8_t* plainBuffer = reinterpret_cast<const uint8_t*>(&stringbuffer[0]);
 
-  // auto buffer = std::make_shared<ndn::Buffer>();
-  // ref.iostream()->rdbuf(), (size_t) b.getPayloadLength()
-  // std::shared_ptr<ndn::Buffer> buffer = make_shared (ref.iostream()->rdbuf(), (size_t) b.getPayloadLength());
-  ndn::ConstBufferPtr constBuffer = ndnBuffer;
-  // cout << buffer;
-  // ndn::Buffer pBuffer;
-  // std::stringstream buffer;
-  // buffer << ref.iostream()->rdbuf();
-  // std::string stringbuffer = buffer.str();
+	  auto ndnBuffer = std::make_shared<ndn::Buffer>(stringbuffer.begin(), stringbuffer.end());
 
-  //stringbuffer << buffer;
+	  // auto buffer = std::make_shared<ndn::Buffer>();
+	  // ref.iostream()->rdbuf(), (size_t) b.getPayloadLength()
+	  // std::shared_ptr<ndn::Buffer> buffer = make_shared (ref.iostream()->rdbuf(), (size_t) b.getPayloadLength());
+	  ndn::ConstBufferPtr constBuffer = ndnBuffer;
+	  // cout << buffer;
+	  // ndn::Buffer pBuffer;
+	  // std::stringstream buffer;
+	  // buffer << ref.iostream()->rdbuf();
+	  // std::string stringbuffer = buffer.str();
 
-  NFD_LOG_FACE_INFO("Bundle payload:" << ref.iostream()->rdbuf() << std::flush);
+	  //stringbuffer << buffer;
 
-  // std::cout << ref.iostream()->rdbuf();
-  // dtn::data::PayloadBlock &p = b.getBlock<dtn::data::PayloadBlock>();
-  // ibrcommon::BLOB::iostream stream = p.getBLOB().iostream();
+	  // NFD_LOG_FACE_INFO("Bundle payload:" << ref.iostream()->rdbuf() << std::flush);
+	  NFD_LOG_FACE_INFO("Bundle payload:" << stringbuffer);
 
-  // std::iostream stream = ref.iostream()->rdbuf();
-  // char *pBuffer = new char[b.getPayloadLength()];
-  // *pBuffer << ref.iostream()->rdbuf();
+	  // std::cout << ref.iostream()->rdbuf();
+	  // dtn::data::PayloadBlock &p = b.getBlock<dtn::data::PayloadBlock>();
+	  // ibrcommon::BLOB::iostream stream = p.getBLOB().iostream();
 
-  Block element;
-  // element.getBuffer() << ref.iostream()->rdbuf();
-  std::tie(isOk, element) = Block::fromBuffer(constBuffer, b.getPayloadLength());
+	  // std::iostream stream = ref.iostream()->rdbuf();
+	  // char *pBuffer = new char[b.getPayloadLength()];
+	  // *pBuffer << ref.iostream()->rdbuf();
 
-  // std::istream stream;
-  // stream << ref.iostream()->rdbuf();
-  // element = Block::fromStream(stream);
+	  Block element;
+	  // element.getBuffer() << ref.iostream()->rdbuf();
+	  // std::tie(isOk, element) = Block::fromBuffer(constBuffer, b.getPayloadLength() );
+	  std::tie(isOk, element) = Block::fromBuffer(plainBuffer, stringbuffer.length());
+	  // std::istream stream;
+	  // stream << ref.iostream()->rdbuf();
+	  // element = Block::fromStream(stream);
 
-  if (!isOk) {
-	NFD_LOG_FACE_WARN("Failed to parse incoming packet");
-	// This packet won't extend the face lifetime
-	return;
-  }
+	  if (!isOk) {
+		NFD_LOG_FACE_WARN("Failed to parse incoming packet");
+		// This packet won't extend the face lifetime
+		return;
+	  }
 
-  Transport::Packet tp(std::move(element));
-  tp.remoteEndpoint = 0;
-  this->receive(std::move(tp));
+	  Transport::Packet tp(std::move(element));
+	  tp.remoteEndpoint = 0;
+	  this->receive(std::move(tp));
 }
 
 
@@ -119,9 +122,12 @@ DtnTransport::doSend(Transport::Packet&& packet)
 	  // create an empty BLOB
 	  ibrcommon::BLOB::Reference ref = ibrcommon::BLOB::create();
 
+	  std::string str(packet.packet.begin(),packet.packet.end());
+	  cout << str;
+	  // std::string test << packet.packet.getBuffer();
 	  // copy cin to a BLOB
-	  (*ref.iostream()) << packet.packet.getBuffer();
-
+	  // (*ref.iostream()) << packet.packet.getBuffer();
+	  (*ref.iostream()) << str;
 	  dtn::data::Bundle b;
 
 	  std::string host = getRemoteUri().getHost();

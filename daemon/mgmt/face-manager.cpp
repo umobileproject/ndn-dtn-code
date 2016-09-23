@@ -931,7 +931,7 @@ FaceManager::processSectionDtn(const ConfigSection& configSection, bool isDryRun
     if (m_factories.count("dtn") > 0) {
       return;
     }
-    NFD_LOG_INFO("setting up DTN:");
+    NFD_LOG_INFO("Setting up DTN");
     //auto factory = make_shared<DtnFactory>();
     shared_ptr<DtnFactory> factory = make_shared<DtnFactory>();
     m_factories.insert(std::make_pair("dtn", factory));
