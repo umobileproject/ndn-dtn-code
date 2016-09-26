@@ -244,18 +244,12 @@ void
 AsyncIbrDtnClient::received(const dtn::data::Bundle &b)
 {
 	NFD_LOG_INFO("AsyncIbrDtnClient RECEIVE BUNDLE");
-	// std::cout << "Bundle Received!" << std::endl;
-	// ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
-	// std::cout << ref.iostream()->rdbuf();
-
 	m_pChannel->processBundle(b, OnFaceCreated, OnReceiveFailed);
-	// connect();
 }
 
 void AsyncIbrDtnClient::eventConnectionDown() throw ()
 {
 	NFD_LOG_INFO("AsyncIbrDtnClient receiver connection down!");
-
 	Client::eventConnectionDown();
 }
 
