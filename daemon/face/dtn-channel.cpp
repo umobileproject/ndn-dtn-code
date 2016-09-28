@@ -28,6 +28,7 @@
 #include <string>
 #include <sys/stat.h> // for chmod()
 #include "generic-link-service.hpp"
+#include "core/scheduler.hpp"
 
 namespace nfd {
 
@@ -69,14 +70,18 @@ DtnChannel::listen(const FaceCreatedCallback& onFaceCreated,
     return;
   }
   m_is_open = true;
+
+  m_onFaceCreated = onFaceCreated;
+  m_onReceiveFailed = onReceiveFailed;
+
   std::string app = m_endpointAffix.substr(1); // Remove leading '/'
 
-  m_pIbrDtnClient = new nfd::AsyncIbrDtnClient(app, m_ibrdtnHost, m_ibrdtndPort, this, onFaceCreated, onReceiveFailed);
-
+  m_pIbrDtnClient = new nfd::AsyncIbrDtnClient(app, m_ibrdtnHost, m_ibrdtndPort, this, getGlobalIoService());
+  m_pIbrDtnClient->Connect();
 }
 
 void
-DtnChannel::processBundle(dtn::data::Bundle b, const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed)
+DtnChannel::processBundle(dtn::data::Bundle b)
 {
 	// Do bundle processing
 	std::string remoteEndpoint = b.source.getString();
@@ -106,18 +111,14 @@ DtnChannel::processBundle(dtn::data::Bundle b, const FaceCreatedCallback& onFace
 	if (face == nullptr)
 	{
 		NFD_LOG_WARN("[" << m_endpointAffix << "] Failed to create face for peer " << remoteEndpoint);
-		if (onReceiveFailed)
-		  onReceiveFailed(remoteEndpoint);
+		if (m_onReceiveFailed)
+			m_onReceiveFailed(remoteEndpoint);
 		return;
 	}
 
 	if (isCreated)
-		onFaceCreated(face);
+		m_onFaceCreated(face);
 
-	// ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
-	// std::cout << ref.iostream()->rdbuf();
-
-	//ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
 	// dispatch the bundle to the face for processing
 	static_cast<face::DtnTransport*>(face->getTransport())->receiveBundle(b);
 }
@@ -217,22 +218,11 @@ DtnChannel::handleAccept(const boost::system::error_code& error,
   accept(onFaceCreated, onAcceptFailed);
 }
 
-
-AsyncIbrDtnClient::AsyncIbrDtnClient(const std::string &app, const std::string &host, uint16_t port, DtnChannel *pChannel,
-	const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed) :
-		dtn::api::Client(app, m_socketStream), m_ibrdtndAddress(host, port), m_socketStream(new ibrcommon::tcpsocket(m_ibrdtndAddress))
+AsyncIbrDtnClient::AsyncIbrDtnClient(const std::string &app, const std::string &host, uint16_t port, DtnChannel *pChannel, boost::asio::io_service &ioService) :
+		dtn::api::Client(app, m_socketStream), m_ibrdtndAddress(host, port), m_socketStream(new ibrcommon::tcpsocket(m_ibrdtndAddress)), m_ioService(ioService)
 {
-	NFD_LOG_INFO("AsyncIbrDtnClient CONSTRUCTOR");
-
+	NFD_LOG_TRACE("AsyncIbrDtnClient CONSTRUCTOR");
 	m_pChannel = pChannel;
-	OnFaceCreated = onFaceCreated;
-	OnReceiveFailed = onReceiveFailed;
-
-	connect();
-	/*
-	dtn::data::Bundle b = getBundle();
-	ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
-	*/
 }
 
 AsyncIbrDtnClient::~AsyncIbrDtnClient()
@@ -240,16 +230,19 @@ AsyncIbrDtnClient::~AsyncIbrDtnClient()
 	NFD_LOG_INFO("AsyncIbrDtnClient DESTRUCTOR");
 }
 
-void
-AsyncIbrDtnClient::received(const dtn::data::Bundle &b)
+void AsyncIbrDtnClient::received(const dtn::data::Bundle &b)
 {
-	NFD_LOG_INFO("AsyncIbrDtnClient RECEIVE BUNDLE");
-	// std::cout << "Bundle Received!" << std::endl;
-	// ibrcommon::BLOB::Reference ref = b.find<dtn::data::PayloadBlock>().getBLOB();
-	// std::cout << ref.iostream()->rdbuf();
+	NFD_LOG_TRACE("AsyncIbrDtnClient RECEIVE BUNDLE");
 
-	m_pChannel->processBundle(b, OnFaceCreated, OnReceiveFailed);
-	// connect();
+	auto f1 = std::bind(&DtnChannel::processBundle, m_pChannel, _1);
+		m_ioService.post([f1, b] {
+		f1(b);
+	  });
+}
+
+void AsyncIbrDtnClient::Connect()
+{
+	connect();
 }
 
 void AsyncIbrDtnClient::eventConnectionDown() throw ()

@@ -73,15 +73,15 @@ public:
    * \param backlog        The maximum length of the queue of pending incoming
    *                       connections
    */
+
   void
   listen(const FaceCreatedCallback& onFaceCreated,
          const FaceCreationFailedCallback& onReceiveFailed);
-         //int backlog);
 
   bool
   isListening() const;
   void
-  processBundle(dtn::data::Bundle b, const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed);
+  processBundle(dtn::data::Bundle b);
 
   void
   connect(const std::string &remoteEndpoint,
@@ -109,13 +109,12 @@ private:
   uint16_t m_ibrdtndPort;
 
   bool m_is_open;
-  // std::map<ibrdtn::Endpoint, shared_ptr<Face>> m_channelFaces;
   std::map<std::string, shared_ptr<Face>> m_channelFaces;
 
-  AsyncIbrDtnClient *m_pIbrDtnClient;
+  FaceCreatedCallback m_onFaceCreated;
+  FaceCreationFailedCallback m_onReceiveFailed;
 
-  //boost::asio::ip::tcp::acceptor m_acceptor;
-  //boost::asio::ip::tcp::socket m_acceptSocket;
+  AsyncIbrDtnClient *m_pIbrDtnClient;
 };
 
 inline bool
@@ -129,11 +128,14 @@ DtnChannel::isListening() const
 class AsyncIbrDtnClient : public dtn::api::Client
 {
 public:
-	AsyncIbrDtnClient(const std::string &app, const std::string &host, uint16_t port, DtnChannel *pChannel,
-			const FaceCreatedCallback& onFaceCreated, const FaceCreationFailedCallback& onReceiveFailed);
+
+	AsyncIbrDtnClient(const std::string &app, const std::string &host, uint16_t port, DtnChannel *pChannel, boost::asio::io_service &ioService);
 
 	virtual ~AsyncIbrDtnClient();
 	virtual void eventConnectionDown() throw ();
+
+	void Connect();
+	DtnChannel *m_pChannel;
 
 protected:
 	/**
@@ -141,15 +143,12 @@ protected:
 	 * to overload the Client::received()-method. This will be call on a incoming bundles
 	 * by another thread.
 	 */
-	// void received(const dtn::data::Bundle &b);
 	virtual void received(const dtn::data::Bundle &b);
 
 	ibrcommon::vaddress m_ibrdtndAddress;
 	ibrcommon::socketstream m_socketStream;
+	boost::asio::io_service &m_ioService;
 
-	DtnChannel *m_pChannel;
-	FaceCreatedCallback OnFaceCreated;
-	FaceCreationFailedCallback OnReceiveFailed;
 };
 } // namespace nfd
 
