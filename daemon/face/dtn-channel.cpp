@@ -240,15 +240,9 @@ void AsyncIbrDtnClient::received(const dtn::data::Bundle &b)
 	  });
 }
 
-void AsyncIbrDtnClient::Connect()
-{
-	connect();
-}
-
 void AsyncIbrDtnClient::eventConnectionDown() throw ()
 {
 	NFD_LOG_INFO("AsyncIbrDtnClient receiver connection down!");
-
 	Client::eventConnectionDown();
 }
 

@@ -74,6 +74,7 @@ DtnTransport::receiveBundle(dtn::data::Bundle b)
 	  Transport::Packet tp(std::move(element));
 	  tp.remoteEndpoint = 0;
 	  this->receive(std::move(tp));
+	  // this->receive(tp);
 }
 
 
