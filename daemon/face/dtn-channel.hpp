@@ -134,7 +134,6 @@ public:
 	virtual ~AsyncIbrDtnClient();
 	virtual void eventConnectionDown() throw ();
 
-	void Connect();
 	DtnChannel *m_pChannel;
 
 protected:

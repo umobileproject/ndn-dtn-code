@@ -77,7 +77,6 @@ DtnChannel::listen(const FaceCreatedCallback& onFaceCreated,
   std::string app = m_endpointAffix.substr(1); // Remove leading '/'
 
   m_pIbrDtnClient = new nfd::AsyncIbrDtnClient(app, m_ibrdtnHost, m_ibrdtndPort, this, getGlobalIoService());
-  m_pIbrDtnClient->Connect();
 }
 
 void
@@ -223,6 +222,7 @@ AsyncIbrDtnClient::AsyncIbrDtnClient(const std::string &app, const std::string &
 {
 	NFD_LOG_TRACE("AsyncIbrDtnClient CONSTRUCTOR");
 	m_pChannel = pChannel;
+	connect();
 }
 
 AsyncIbrDtnClient::~AsyncIbrDtnClient()
