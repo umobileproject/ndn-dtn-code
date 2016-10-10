@@ -6,3 +6,7 @@
 build/
 VERSION
 unit-tests.conf
+/websocket.tar.gz
+/websocketpp/
+/.cproject
+/.project
