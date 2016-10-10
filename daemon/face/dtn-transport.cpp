@@ -46,24 +46,16 @@ DtnTransport::receiveBundle(dtn::data::Bundle b)
 
 	  Block element;
 
-	  // 1. Non-working solution, based on ndn data types.
-	  /*
-		auto ndnBuffer = std::make_shared<ndn::Buffer>(stringbuffer.begin(), stringbuffer.end());
-		ndn::ConstBufferPtr constBuffer = ndnBuffer;
-	   */
-
-	  // 2. Working solution, based on getting the buffer directly from the string.
+	  // 1. Working solution 1, based on getting the buffer directly from the string.
 	  /*
 		const uint8_t* plainBuffer = reinterpret_cast<const uint8_t*>(&stringBuffer[0]);
 		std::tie(isOk, element) = Block::fromBuffer(plainBuffer, stringBuffer.length());
 	  */
-	  // 3. Test solution
+
+	  // 2. Working solution 2
 	  uint8_t* plainBuffer = new uint8_t[stringBuffer.length() + 1];
 	  std::copy(stringBuffer.begin(), stringBuffer.end(), plainBuffer);
 	  std::tie(isOk, element) = Block::fromBuffer(plainBuffer, stringBuffer.length());
-
-	  // NFD_LOG_FACE_INFO("Bundle payload:" << ref.iostream()->rdbuf() << std::flush);
-	  // NFD_LOG_FACE_INFO("Bundle payload:" << stringBuffer);
 
 	  if (!isOk) {
 		NFD_LOG_FACE_WARN("Failed to parse incoming packet");
@@ -74,7 +66,6 @@ DtnTransport::receiveBundle(dtn::data::Bundle b)
 	  Transport::Packet tp(std::move(element));
 	  tp.remoteEndpoint = 0;
 	  this->receive(std::move(tp));
-	  // this->receive(tp);
 }
 
 
@@ -110,18 +101,12 @@ DtnTransport::doSend(Transport::Packet&& packet)
 	  ibrcommon::BLOB::Reference ref = ibrcommon::BLOB::create();
 
 	  std::string str(packet.packet.begin(),packet.packet.end());
-	  // cout << str;
-	  // std::string test << packet.packet.getBuffer();
-	  // copy cin to a BLOB
-	  // (*ref.iostream()) << packet.packet.getBuffer();
 	  (*ref.iostream()) << str;
 	  dtn::data::Bundle b;
 
 	  std::string host = getRemoteUri().getHost();
 	  std::string port = getRemoteUri().getPath();
 	  std::string destinationAddress = getRemoteUri().getScheme() + "://" + getRemoteUri().getHost() + getRemoteUri().getPath();
-	  // set the destination
-	  // dtn::data::EID eid("dtn://ubuntu2/nfd");
 
 	  b.destination = destinationAddress;
 

@@ -91,9 +91,11 @@ def configure(conf):
     conf.checkDependency(name='libresolv', lib='resolv', mandatory=False)
     conf.checkDependency(name='libibrcommon', lib='ibrcommon')
     conf.checkDependency(name='libibrdtn', lib='ibrdtn')
+    conf.env.append_value('INCLUDES', ['/usr/local/include/ibrdtn-1.0/', '/usr/local/include/ibrcommon-1.0/'])
 
     if not conf.check_cxx(msg='Checking if privilege drop/elevation is supported', mandatory=False,
                           define_name='HAVE_PRIVILEGE_DROP_AND_ELEVATE', fragment='''
+
 #include <unistd.h>
 #include <pwd.h>
 #include <grp.h>
