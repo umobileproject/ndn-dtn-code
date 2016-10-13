@@ -105,7 +105,6 @@ class GccBasicFlags(CompilerFlags):
                               '-pedantic',
                               '-Wall',
                               '-Wextra',
-                              '-Werror',
                               '-Wno-unused-parameter',
                               '-Wno-error=maybe-uninitialized', # Bug #1615
                               ]
